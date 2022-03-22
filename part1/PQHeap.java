@@ -12,16 +12,17 @@ public class PQHeap implements PQ {
      * Pre: the priority queue cannot be empty.
      */
     public Element extractMin() {
-        // TODO: everything inside here...
-
-        return new Element(0, "test_string");
+        Element min = queue.get(0);
+        queue.set(0, queue.remove(queue.size() - 1));
+        minHeapify(0);
+        return min;
     }
 
     /*
      * Inserts element e into the priority queue.
      */
     public void insert(Element e) {
-
+        minHeapInsert(e);
     }
 
     private int leftIdx(int i) {
@@ -49,8 +50,29 @@ public class PQHeap implements PQ {
         }
     }
 
-    public void insert(int key, Object data) {
-        minHeapInsert(new Element(key, data));
+    private void minHeapify(int i) {
+        int l = leftIdx(i);
+        int r = rightIdx(i);
+
+        int smallest;
+
+        if (l < queue.size() && queue.get(l).getKey() <= queue.get(i).getKey()) {
+            smallest = l;
+        } else {
+            smallest = i;
+        }
+
+        if (r < queue.size() && queue.get(r).getKey() <= queue.get(smallest).getKey()) {
+            smallest = r;
+        }
+
+        if (smallest != i) {
+            Element tmpElem = queue.get(i);
+            queue.set(i, queue.get(smallest));
+            queue.set(smallest, tmpElem);
+
+            minHeapify(smallest);
+        }
     }
 
     /* Overrides */
