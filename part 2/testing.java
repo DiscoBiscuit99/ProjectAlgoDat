@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.IOException;
 import java.io.File;
@@ -15,6 +16,10 @@ public class testing {
         } catch (IOException e) {
            e.printStackTrace();
         }
-        System.out.println(tree.orderedTraversal());
+        ArrayList<Integer> list = tree.orderedTraversal();
+        System.out.println(list.size());
+       /* for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }*/
     }
 }

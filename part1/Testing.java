@@ -17,7 +17,8 @@ public class Testing {
         //pq.insert(new Element(-2, "data4"));
         //pq.insert(new Element(3, "data5"));
         //pq.insert(new Element(0, "data?"));
-
+        System.out.println(pq.extractMin().getKey());
+        System.out.println("---------");
         System.out.println(pq);
 
         //pq.extractMin();
