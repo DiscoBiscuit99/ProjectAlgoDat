@@ -64,22 +64,27 @@ public class DictBinTree implements Dict {
         return list;
     }
     private void orderedTraversalRec(ArrayList<Integer> list, BinNode node){
+        System.out.println(node.key);
+        // Adds the notes key to the list if its a leaf.
         if(node.left == null && node.right == null){
+            System.out.println("null add " + node.key);
             list.add(node.key);
         }
+        // The recursion procedes down to the nodes smaller child.
         if(node.left != null){
+            System.out.println("left ");
             orderedTraversalRec(list, node.left);
         }
-        System.out.println("left");
-        if(node.left != null || node.left != null){
+        // Adds the note's key to list.
+        if(node.left != null || node.right != null){
+            System.out.println("add " + node.key);
             list.add(node.key);
-            System.out.println("add");
         }
-
+        //  The recursion procedes down to the nodes larger child.
         if(node.right != null){
+            System.out.println("right");
             orderedTraversalRec(list, node.right);
         }
-        System.out.println("right");
     }
 
 

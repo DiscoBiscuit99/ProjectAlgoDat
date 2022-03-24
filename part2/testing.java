@@ -12,11 +12,11 @@ public class testing {
             while(scanner.hasNextInt()){
                 tree.insert(scanner.nextInt());
             }
-            System.out.println(tree.search(-117));
         } catch (IOException e) {
            e.printStackTrace();
         }
         ArrayList<Integer> list = tree.orderedTraversal();
         System.out.println(list);
+        System.out.println(tree.search(-117));
     }
 }
