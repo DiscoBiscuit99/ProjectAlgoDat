@@ -3,7 +3,7 @@
  * Ian Andersen (...)
  * Valdemar Lorenzen (valor21@student.sdu.dk)
  *
- * Aflevering af delprojekt 1.
+ * Aflevering af delprojekt 1 - Algoritmer og Datastrukturer.
  */
 
 import java.util.ArrayList;
@@ -16,30 +16,6 @@ public class PQHeap implements PQ {
      */
     public PQHeap() {
         queue = new ArrayList<Element>();
-    }
-
-    /*
-     * Removes the element of least priority and returns it.
-     * Pre: the priority queue cannot be empty.
-     */
-    public Element extractMin() {
-        Element min;
-
-        if (queue.size() > 1) {
-            min = queue.get(0);
-            queue.set(0, queue.remove(queue.size() - 1));
-            minHeapify(0);
-        } else
-            min = queue.remove(0);
-
-        return min;
-    }
-
-    /*
-     * Inserts element e into the priority queue.
-     */
-    public void insert(Element e) {
-        minHeapInsert(e);
     }
 
     /*
@@ -115,6 +91,30 @@ public class PQHeap implements PQ {
     }
 
     // Overrides //
+
+    /*
+     * Removes the element of least priority and returns it.
+     * Pre: the priority queue cannot be empty.
+     */
+    public Element extractMin() {
+        Element min;
+
+        if (queue.size() > 1) {
+            min = queue.get(0);
+            queue.set(0, queue.remove(queue.size() - 1));
+            minHeapify(0);
+        } else
+            min = queue.remove(0);
+
+        return min;
+    }
+
+    /*
+     * Inserts element e into the priority queue.
+     */
+    public void insert(Element e) {
+        minHeapInsert(e);
+    }
 
     /*
      * Returns a textual representation of the priority queue.
