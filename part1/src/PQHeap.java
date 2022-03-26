@@ -122,9 +122,8 @@ public class PQHeap implements PQ {
     public String toString() {
         String str = "";
 
-        for (Element elem : queue) {
+        for (Element elem : queue)
             str += "(" + elem.getKey() + ", " + elem.getData().toString() + ")   ";
-        }
 
         return str;
     }
