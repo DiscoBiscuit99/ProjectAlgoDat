@@ -1,6 +1,6 @@
 /*
- * Bastian Graver (...)
- * Ian Andersen (...)
+ * Bastian Blohm (bablo21@student.sdu.dk)
+ * Ian Andersen (iaand21@student.sdu.dk)
  * Valdemar Lorenzen (valor21@student.sdu.dk)
  *
  * Aflevering af delprojekt 1 - Algoritmer og Datastrukturer.
