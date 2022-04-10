@@ -1,6 +1,8 @@
+import java.util.Scanner;
+
 public class Treesort {
 
-    public void treesort() {
+    public static void treesort() {
 
         DictBinTree dict = new DictBinTree();
         Scanner scanner = new Scanner(System.in);
