@@ -55,6 +55,7 @@ public class DictBinTree implements Dict {
             xs.add(x.key);
             orderedTraversal(x.right, xs);
         }
+
         return xs;
     }
 
