@@ -11,6 +11,8 @@ public class Testing {
 
         for (int n : dict.orderedTraversal())
             System.out.println(n);
+        
+        scanner.close();
     }
 }
 
