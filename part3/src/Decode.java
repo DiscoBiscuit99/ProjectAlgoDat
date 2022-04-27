@@ -7,7 +7,14 @@ public class Decode {
 
     public static void main( String[] args ) {
 
-        int[] frequencies = decode( "compressed", "decompressed" );
+        if ( args.length < 2 ) {
+
+            System.out.println( "The name of the file to decompressed and the new decompressed file must be given..." );
+            System.exit( 1 );
+
+        }
+
+        int[] frequencies = decode( args[ 0 ], args[ 1 ] );
     
         //for ( int i = 0; i < frequencies.length; i++ )
             //System.out.println( (char) i + ": " + frequencies[i] );
@@ -41,6 +48,9 @@ public class Decode {
 
             }
 
+            for ( i = 0; i < frequencies.length; i++ )
+                System.out.println( (char) i + ": " + frequencies[ i ] );
+
             HuffmanTree huffman = huffman( frequencies );
 
             Node currentNode = huffman.root();
@@ -58,8 +68,6 @@ public class Decode {
 
                         Element element = (Element) ( (Node) currentNode ).left();
 
-                        System.out.println( "left" );
-
                         if ( element.data() instanceof Node )
                             currentNode = (Node) element.data();
 
@@ -70,6 +78,8 @@ public class Decode {
                             System.out.println( "Writing " + (char) c );
 
                             foStream.write( (char) c );
+
+                            currentNode = huffman.root();
 
                             i++;
 
@@ -84,8 +94,6 @@ public class Decode {
 
                         Element element = (Element) ( (Node) currentNode ).right();
 
-                        System.out.println( "right" );
-
                         if ( element.data() instanceof Node )
                             currentNode = (Node) element.data();
 
@@ -97,6 +105,8 @@ public class Decode {
                             System.out.println();
 
                             foStream.write( (char) c );
+
+                            currentNode = huffman.root();
 
                             i++;
 

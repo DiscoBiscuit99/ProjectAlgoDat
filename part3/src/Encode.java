@@ -10,7 +10,7 @@ public class Encode {
         // Make sure two filenames are given.
         if ( args.length < 2 ) {
 
-            System.out.println( "The name of the file to encode and the new compressed file must be given..." );
+            System.out.println( "The name of the file to compress and the new compressed file must be given..." );
             System.exit( 1 );
 
         }
