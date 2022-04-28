@@ -51,68 +51,94 @@ public class Decode {
             for ( i = 0; i < frequencies.length; i++ )
                 System.out.println( (char) i + ": " + frequencies[ i ] );
 
-            HuffmanTree huffman = huffman( frequencies );
+            Element root = huffman( frequencies );
+            Element currentNode = root;
 
-            Node currentNode = huffman.root();
+            System.out.println();
+
             i = 0;
             while ( i < total ) {
 
-                //System.out.println( "i " + i + " out of " + total );
-
                 int b = biStream.readBit();
+
+                System.out.println( "b = " + b );
 
                 // Check which way to descend in the tree.
                 if ( b == 0 ) {
 
-                    if ( ( (Node) currentNode ).left() != null ) {
+                    if ( currentNode.data() instanceof Node )
+                        currentNode = (Element) ( (Node) currentNode.data() ).left();
 
-                        Element element = (Element) ( (Node) currentNode ).left();
+                    if ( currentNode.data() instanceof Integer ) {
 
-                        if ( element.data() instanceof Node )
-                            currentNode = (Node) element.data();
+                        int c = (int) currentNode.data();
 
-                        else if ( element.data() instanceof Integer ) {
+                        System.out.println( "\nWriting " + (char) c + "and b is " + b );
 
-                            int c = (int) element.data();
+                        foStream.write( (char) c );
+                        
+                        currentNode = root;
 
-                            System.out.println( "Writing " + (char) c );
-
-                            foStream.write( (char) c );
-
-                            currentNode = huffman.root();
-
-                            i++;
-
-                        }
+                        i++;
 
                     }
 
+                    //if ( currentNode instanceof Node )
+                        //currentNode = ( (Node) currentNode ).left();
+
+                    //else if ( currentNode instanceof Integer ) {
+
+                        //int c = (int) currentNode;
+
+                        //System.out.println( "\nWriting " + (char) c );
+
+                        //foStream.write( (char) c );
+
+                        //currentNode = huffman.root();
+
+                        //i++;
+
+                    //}
+
+                } else if ( b == 1 ) {
+
+                    if ( currentNode.data() instanceof Node )
+                        currentNode = (Element) ( (Node) currentNode.data() ).right();
+
+                    if ( currentNode.data() instanceof Integer ) {
+
+                        int c = (int) currentNode.data();
+
+                        System.out.println( "\nWriting " + (char) c );
+
+                        foStream.write( (char) c );
+
+                        currentNode = root;
+
+                        i++;
+
+                    }
+
+                    //if ( currentNode instanceof Node )
+                        //currentNode = ( (Node) currentNode ).right();
+
+                    //else if ( currentNode instanceof Integer ) {
+
+                        //int c = (int) currentNode;
+
+                        //System.out.println( "Writing" + (char) c );
+
+                        //foStream.write( (char) c );
+
+                        //currentNode = huffman.root();
+
+                        //i++;
+
+                    //}
 
                 } else {
 
-                    if ( ( (Node) currentNode ).right() != null ) {
-
-                        Element element = (Element) ( (Node) currentNode ).right();
-
-                        if ( element.data() instanceof Node )
-                            currentNode = (Node) element.data();
-
-                        else if ( element.data() instanceof Integer ) {
-
-                            int c = (Integer) element.data();
-
-                            System.out.println( "Writing " + (char) c );
-                            System.out.println();
-
-                            foStream.write( (char) c );
-
-                            currentNode = huffman.root();
-
-                            i++;
-
-                        }
-
-                    }
+                    break;
 
                 }
 
@@ -139,7 +165,7 @@ public class Decode {
      *
      * @return              The newly constructed huffman tree.
      */
-    private static HuffmanTree huffman( int[] frequencies ) {
+    private static Element huffman( int[] frequencies ) {
 
         // 1.) Construct the priority queue.
 
@@ -148,33 +174,25 @@ public class Decode {
         for ( int i = 0; i < frequencies.length; i++ )
             huffmanQueue.insert( new Element( frequencies[i], i ) );
 
-        // 2.) Construct the huffman nodes from the priority queue.
+        // 2.) Construct the huffman nodes from the priority queue and build the tree.
 
         while ( huffmanQueue.size() > 1 ) {
 
-            Element x = huffmanQueue.extractMin();
-            Element y = huffmanQueue.extractMin();
+            Element leftElem = huffmanQueue.extractMin();
+            Element rightElem = huffmanQueue.extractMin();
 
-            int key = x.key() + y.key();
+            int freq = leftElem.key() + rightElem.key();
 
-            Node node = new Node( key, x, y );
+            Node node = new Node( leftElem, rightElem );
 
-            Element nodeWrapped = new Element( node.key(), node );
+            Element nodeElement = new Element( freq, node );
 
-            huffmanQueue.insert( nodeWrapped );
+            huffmanQueue.insert( nodeElement );
 
         }
 
-        // 3.) Construct the Huffman tree.
+        return huffmanQueue.extractMin();
 
-        Element rootWrapped = huffmanQueue.extractMin();
-
-        Node root = (Node) rootWrapped.data();
-
-        HuffmanTree huffman = new HuffmanTree( root );
-
-        return huffman;
-        
     }
 
 }

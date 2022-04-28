@@ -18,31 +18,16 @@ public class Encode {
         int[] frequencies = constructFreqTable( args[0] );
 
         for ( int i = 0; i < frequencies.length; i++ )
-            System.out.print( "[" + (char) i + ": " + frequencies[i] + "]   " );
+            System.out.println( (char) i + ": " + frequencies[i] );
 
-        HuffmanTree huffman = huffman( frequencies );
+        Element huffman = huffman( frequencies );
 
         // TESTING STUFF //
-
-        Node root = huffman.root();
-
-        System.out.println();
-        System.out.println();
-        System.out.println( "root frequency: " + root.key() );
-
-        int total = 0;
-        for ( int i = 0; i < frequencies.length; i++ )
-            total += frequencies[i];
-
-        System.out.println( "total frequencies: " + total );
 
         String[] codewords = generateCodewords( huffman );
 
         for ( int c = 0; c < codewords.length; c++ )
             System.out.println( (char) c + ": " + codewords[ c ] );
-
-        // TODO: write the frequencies table to the compressed file,
-        //       scan the input file again and write the codeword for any given character to the file.
 
         writeCompression( frequencies, codewords, args[ 0 ], args[ 1 ] );
         
@@ -56,27 +41,33 @@ public class Encode {
         try {
 
             File compressedFile = new File( filenameCompressed );
-            FileOutputStream oStream = new FileOutputStream( compressedFile );
-            BitOutputStream bStream = new BitOutputStream( oStream );
+            FileOutputStream foStream = new FileOutputStream( compressedFile );
+            BitOutputStream boStream = new BitOutputStream( foStream );
 
             for ( int f : frequencies )
-                bStream.writeInt( f );
+                boStream.writeInt( f );
 
             File original = new File( filenameOriginal );
-            FileInputStream iStream = new FileInputStream( original );
+            FileInputStream fiStream = new FileInputStream( original );
 
             int c;
-            while ( ( c = iStream.read() ) != -1 ) {
+            while ( ( c = fiStream.read() ) != -1 ) {
 
                 String[] splitWord = codewords[ c ].split( "" );
 
-                for ( String b : splitWord )
-                    bStream.writeBit( Integer.parseInt( b ) );
+                for ( String b : splitWord ) {
+
+                    System.out.println( "Writing " + b );
+                    boStream.writeBit( Integer.parseInt( b ) );
+
+                }
+
+                System.out.println();
 
             }
 
-            iStream.close();
-            bStream.close();
+            fiStream.close();
+            boStream.close();
 
         } catch ( IOException e ) {
 
@@ -127,7 +118,7 @@ public class Encode {
      *
      * @return              The newly constructed huffman tree.
      */
-    private static HuffmanTree huffman( int[] frequencies ) {
+    private static Element huffman( int[] frequencies ) {
 
         // 1.) Construct the priority queue.
 
@@ -136,32 +127,24 @@ public class Encode {
         for ( int i = 0; i < frequencies.length; i++ )
             huffmanQueue.insert( new Element( frequencies[i], i ) );
 
-        // 2.) Construct the huffman nodes from the priority queue.
+        // 2.) Construct the huffman nodes from the priority queue and build the tree.
 
         while ( huffmanQueue.size() > 1 ) {
 
-            Element x = huffmanQueue.extractMin();
-            Element y = huffmanQueue.extractMin();
+            Element leftElem = huffmanQueue.extractMin();
+            Element rightElem = huffmanQueue.extractMin();
 
-            int key = x.key() + y.key();
+            int freq = leftElem.key() + rightElem.key();
 
-            Node node = new Node( key, x, y );
+            Node node = new Node( leftElem, rightElem );
 
-            Element nodeWrapped = new Element( node.key(), node );
+            Element nodeElement = new Element( freq, node );
 
-            huffmanQueue.insert( nodeWrapped );
+            huffmanQueue.insert( nodeElement );
 
         }
 
-        // 3.) Construct the Huffman tree.
-
-        Element rootWrapped = huffmanQueue.extractMin();
-
-        Node root = (Node) rootWrapped.data();
-
-        HuffmanTree huffman = new HuffmanTree( root );
-
-        return huffman;
+        return huffmanQueue.extractMin();
 
     }
 
@@ -173,13 +156,13 @@ public class Encode {
      *
      * @return          An integer array of the generated codewords.
      */
-    private static String[] generateCodewords( HuffmanTree huffman ) {
+    private static String[] generateCodewords( Element huffman ) {
 
         // Traverse the tree and generate the codewords.
 
         String[] codewords = new String[ 256 ];
 
-        generateCodewords( huffman.root(), "", codewords );
+        generateCodewords( huffman, "", codewords );
 
         return codewords;
 
@@ -188,49 +171,135 @@ public class Encode {
     /**
      * Auxiliary function... TODO: write the doc.
      */
-    private static void generateCodewords( Node node, String word, String[] codewords ) {
+    private static void generateCodewords( Element nodeElem, String word, String[] codewords ) {
 
-        if ( node.left() != null ) {
+        /* 
+         * Procedure: check if the node is a leaf node.
+         * If it is, add the generated codeword to the array of codewords.
+         * If not, generate codewords for both the left and right child of the 
+         * current node. It is observed that non-leaf nodes in the Huffman tree 
+         * will always have both a left and a right child.
+         */
 
-            Element leftElement = (Element) ( (Node) node ).left();
+        if ( nodeElem.data() instanceof Node ) {
 
-            if ( leftElement.data() instanceof Node ) {
+            Element left = (Element) ( (Node) nodeElem.data() ).left();
+            Element right = (Element) ( (Node) nodeElem.data() ).right();
 
-                Node left = (Node) leftElement.data();
+            generateCodewords( left, word + "0", codewords );
+            generateCodewords( right, word + "1", codewords );
 
-                word += "0";
+        } else {
 
-                generateCodewords( left, word, codewords );
-
-            } else if ( leftElement.data() instanceof Integer ) {
-
-                int c = (int) leftElement.data();
-                codewords[ c ] = word;
-
-            }
-
-        }
-
-        if ( node.right() != null ) {
-
-            Element rightElement = (Element) node.right();
-
-            if ( rightElement.data() instanceof Node ) {
-
-                Node right = (Node) rightElement.data();
-
-                word += "1";
-
-                generateCodewords( right, word, codewords );
-
-            } else if ( rightElement.data() instanceof Integer ) {
-
-                int c = (int) rightElement.data();
-                codewords[ c ] = word;
-
-            }
+            // Must be an integer - hopefully.
+            int c = (int) nodeElem.data();
+            codewords[ c ] = word;
 
         }
+
+        //if ( node instanceof Node ) {
+
+            //Object left = ( (Node) node ).left();
+            //Object right = ( (Node) node ).right();
+
+            //generateCodewords( left, word + "0", codewords );
+            //generateCodewords( right, word + "1", codewords );
+
+        //} else {
+
+            //int c = (int) node;
+            //codewords[ c ] = word;
+
+        //}
+
+        //if ( elem.data() instanceof Node ) {
+
+            //Element left = ( (Node) elem.data() ).left();
+            //Element right = ( (Node) elem.data() ).right();
+
+            //generateCodewords( left, word + "0", codewords );
+            //generateCodewords( right, word + "1", codewords );
+
+        //} else {
+
+            //int c = (int) elem.data();
+
+            //codewords[ c ] = word;
+
+        //}
+
+        //if ( node != null && node instanceof Element ) {
+
+            //Element elem = (Element) node;
+
+            //int c = (int) elem.data();
+
+            //codewords[ c ] = word;
+
+        //} else ( node != null && node instanceof Node ) {
+
+            //generateCodewords( node.left(), word + "0", codewords );
+            //generateCodewords( node.right(), word + "1", codewords );
+
+        //}
+
+        //if ( node.left() == null && node.right() == null ) {
+
+            //Element elem = (Element) node;
+
+            //int c = (int) elem.data();
+
+            //codewords[ c ] = word;
+
+        //} else {
+
+            //generateCodewords( (Node) node.left(), word + "0", codewords );
+            //generateCodewords( (Node) node.right(), word + "1", codewords );
+
+        //}
+
+
+        //if ( node.left() != null ) {
+
+            //Element leftElement = (Element) ( (Node) node ).left();
+
+            //if ( leftElement.data() instanceof Node ) {
+
+                //Node left = (Node) leftElement.data();
+
+                //word += "0";
+
+                //generateCodewords( left, word, codewords );
+
+            //} else if ( leftElement.data() instanceof Integer ) {
+
+                //int c = (int) leftElement.data();
+                //codewords[ c ] = word;
+
+            //}
+
+        //}
+
+        //if ( node.right() != null ) {
+
+            //Element rightElement = (Element) node.right();
+
+            //if ( rightElement.data() instanceof Node ) {
+
+                //Node right = (Node) rightElement.data();
+
+                //word += "1";
+
+                //generateCodewords( right, word, codewords );
+
+            //} else if ( rightElement.data() instanceof Integer ) {
+
+                //int c = (int) rightElement.data();
+                //codewords[ c ] = word;
+
+            //}
+
+        //}
 
     }
 

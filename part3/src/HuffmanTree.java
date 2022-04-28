@@ -14,6 +14,12 @@ public class HuffmanTree {
 
     }
 
+    public void root( Node root ) {
+
+        this.root = root;
+
+    }
+
     public String toString() {
 
         String[] codewords = new String[ 256 ];
