@@ -15,9 +15,6 @@ public class Decode {
         }
 
         int[] frequencies = decode( args[ 0 ], args[ 1 ] );
-    
-        //for ( int i = 0; i < frequencies.length; i++ )
-            //System.out.println( (char) i + ": " + frequencies[i] );
 
     }
 
@@ -48,20 +45,13 @@ public class Decode {
 
             }
 
-            for ( i = 0; i < frequencies.length; i++ )
-                System.out.println( (char) i + ": " + frequencies[ i ] );
-
             Element root = huffman( frequencies );
             Element currentNode = root;
-
-            System.out.println();
 
             i = 0;
             while ( i < total ) {
 
                 int b = biStream.readBit();
-
-                System.out.println( "b = " + b );
 
                 // Check which way to descend in the tree.
                 if ( b == 0 ) {
@@ -73,8 +63,6 @@ public class Decode {
 
                         int c = (int) currentNode.data();
 
-                        System.out.println( "\nWriting " + (char) c + "and b is " + b );
-
                         foStream.write( (char) c );
                         
                         currentNode = root;
@@ -82,23 +70,6 @@ public class Decode {
                         i++;
 
                     }
-
-                    //if ( currentNode instanceof Node )
-                        //currentNode = ( (Node) currentNode ).left();
-
-                    //else if ( currentNode instanceof Integer ) {
-
-                        //int c = (int) currentNode;
-
-                        //System.out.println( "\nWriting " + (char) c );
-
-                        //foStream.write( (char) c );
-
-                        //currentNode = huffman.root();
-
-                        //i++;
-
-                    //}
 
                 } else if ( b == 1 ) {
 
@@ -109,8 +80,6 @@ public class Decode {
 
                         int c = (int) currentNode.data();
 
-                        System.out.println( "\nWriting " + (char) c );
-
                         foStream.write( (char) c );
 
                         currentNode = root;
@@ -119,23 +88,6 @@ public class Decode {
 
                     }
 
-                    //if ( currentNode instanceof Node )
-                        //currentNode = ( (Node) currentNode ).right();
-
-                    //else if ( currentNode instanceof Integer ) {
-
-                        //int c = (int) currentNode;
-
-                        //System.out.println( "Writing" + (char) c );
-
-                        //foStream.write( (char) c );
-
-                        //currentNode = huffman.root();
-
-                        //i++;
-
-                    //}
-
                 } else {
 
                     break;
@@ -143,8 +95,6 @@ public class Decode {
                 }
 
             }
-
-            System.out.println( "total: " + total );
 
             biStream.close();
 

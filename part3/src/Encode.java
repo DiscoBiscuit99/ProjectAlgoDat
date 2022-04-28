@@ -17,17 +17,9 @@ public class Encode {
 
         int[] frequencies = constructFreqTable( args[0] );
 
-        for ( int i = 0; i < frequencies.length; i++ )
-            System.out.println( (char) i + ": " + frequencies[i] );
-
         Element huffman = huffman( frequencies );
 
-        // TESTING STUFF //
-
         String[] codewords = generateCodewords( huffman );
-
-        for ( int c = 0; c < codewords.length; c++ )
-            System.out.println( (char) c + ": " + codewords[ c ] );
 
         writeCompression( frequencies, codewords, args[ 0 ], args[ 1 ] );
         
@@ -55,14 +47,8 @@ public class Encode {
 
                 String[] splitWord = codewords[ c ].split( "" );
 
-                for ( String b : splitWord ) {
-
-                    System.out.println( "Writing " + b );
+                for ( String b : splitWord )
                     boStream.writeBit( Integer.parseInt( b ) );
-
-                }
-
-                System.out.println();
 
             }
 
@@ -196,110 +182,6 @@ public class Encode {
             codewords[ c ] = word;
 
         }
-
-        //if ( node instanceof Node ) {
-
-            //Object left = ( (Node) node ).left();
-            //Object right = ( (Node) node ).right();
-
-            //generateCodewords( left, word + "0", codewords );
-            //generateCodewords( right, word + "1", codewords );
-
-        //} else {
-
-            //int c = (int) node;
-            //codewords[ c ] = word;
-
-        //}
-
-        //if ( elem.data() instanceof Node ) {
-
-            //Element left = ( (Node) elem.data() ).left();
-            //Element right = ( (Node) elem.data() ).right();
-
-            //generateCodewords( left, word + "0", codewords );
-            //generateCodewords( right, word + "1", codewords );
-
-        //} else {
-
-            //int c = (int) elem.data();
-
-            //codewords[ c ] = word;
-
-        //}
-
-        //if ( node != null && node instanceof Element ) {
-
-            //Element elem = (Element) node;
-
-            //int c = (int) elem.data();
-
-            //codewords[ c ] = word;
-
-        //} else ( node != null && node instanceof Node ) {
-
-            //generateCodewords( node.left(), word + "0", codewords );
-            //generateCodewords( node.right(), word + "1", codewords );
-
-        //}
-
-        //if ( node.left() == null && node.right() == null ) {
-
-            //Element elem = (Element) node;
-
-            //int c = (int) elem.data();
-
-            //codewords[ c ] = word;
-
-        //} else {
-
-            //generateCodewords( (Node) node.left(), word + "0", codewords );
-            //generateCodewords( (Node) node.right(), word + "1", codewords );
-
-        //}
-
-
-        //if ( node.left() != null ) {
-
-            //Element leftElement = (Element) ( (Node) node ).left();
-
-            //if ( leftElement.data() instanceof Node ) {
-
-                //Node left = (Node) leftElement.data();
-
-                //word += "0";
-
-                //generateCodewords( left, word, codewords );
-
-            //} else if ( leftElement.data() instanceof Integer ) {
-
-                //int c = (int) leftElement.data();
-                //codewords[ c ] = word;
-
-            //}
-
-        //}
-
-        //if ( node.right() != null ) {
-
-            //Element rightElement = (Element) node.right();
-
-            //if ( rightElement.data() instanceof Node ) {
-
-                //Node right = (Node) rightElement.data();
-
-                //word += "1";
-
-                //generateCodewords( right, word, codewords );
-
-            //} else if ( rightElement.data() instanceof Integer ) {
-
-                //int c = (int) rightElement.data();
-                //codewords[ c ] = word;
-
-            //}
-
-        //}
 
     }
 
