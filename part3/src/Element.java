@@ -33,5 +33,9 @@ public class Element {
 
     }
 
+    public String toString() {
+        return "key: " + key + ", data: " + data;
+    }
+
 }
 

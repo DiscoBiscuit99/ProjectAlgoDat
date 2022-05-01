@@ -14,7 +14,10 @@ public class Decode {
 
         }
 
-        int[] frequencies = decode( args[ 0 ], args[ 1 ] );
+        String filenameCompressed = args[ 0 ];
+        String filenameDecompressed = args[ 1 ];
+
+        decode( filenameCompressed, filenameDecompressed );
 
     }
 
@@ -32,71 +35,70 @@ public class Decode {
 
             FileOutputStream foStream = new FileOutputStream( decompressed );
 
-            int i = 0;
-            int total = 0;
-            while ( i < frequencies.length ) {
+
+            // 1. Construct the frequency table from the start of the compressed file.
+
+            for ( int i = 0; i < frequencies.length; i++ ) {
 
                 int frequency = biStream.readInt();
-
-                total += frequency;
                 frequencies[ i ] = frequency;
 
-                i++;
-
             }
+            
+            // 2. Construct the Huffman tree from the frequency table.
 
-            Element root = huffman( frequencies );
-            Element currentNode = root;
+            Huffman ht = new Huffman();
+            ht.constructTree( frequencies );
 
-            i = 0;
-            while ( i < total ) {
+            // 3. Decode the file by descending the tree with each bit in the compressed file.
 
-                int b = biStream.readBit();
+            Element currentNode = ht.root();
 
-                // Check which way to descend in the tree.
-                if ( b == 0 ) {
+            int b = 0;
+            while ( b != -1 ) {
 
-                    if ( currentNode.data() instanceof Node )
-                        currentNode = (Element) ( (Node) currentNode.data() ).left();
+                b = biStream.readBit();
 
-                    if ( currentNode.data() instanceof Integer ) {
+                switch ( b ) {
 
-                        int c = (int) currentNode.data();
+                    // A left node is found.
+                    case 0:
 
-                        foStream.write( (char) c );
-                        
-                        currentNode = root;
+                        if ( currentNode.data() instanceof Node )
+                            currentNode = (Element) ( (Node) currentNode.data() ).left();
 
-                        i++;
+                        if ( currentNode.data() instanceof Character ) {
 
-                    }
+                            char c = (char) currentNode.data();
+                            foStream.write( c );
+                            currentNode = ht.root();
 
-                } else if ( b == 1 ) {
+                        }
 
-                    if ( currentNode.data() instanceof Node )
-                        currentNode = (Element) ( (Node) currentNode.data() ).right();
+                        break;
 
-                    if ( currentNode.data() instanceof Integer ) {
+                    // A right node is found.
+                    case 1:
 
-                        int c = (int) currentNode.data();
+                        if ( currentNode.data() instanceof Node )
+                            currentNode = (Element) ( (Node) currentNode.data() ).right();
 
-                        foStream.write( (char) c );
+                        if ( currentNode.data() instanceof Character ) {
 
-                        currentNode = root;
+                            char c = (char) currentNode.data();
+                            foStream.write( c );
+                            currentNode = ht.root();
 
-                        i++;
+                        }
 
-                    }
-
-                } else {
-
-                    break;
+                        break;
 
                 }
 
             }
 
             biStream.close();
+            foStream.close();
 
         } catch ( IOException e ) {
             
@@ -105,43 +107,6 @@ public class Decode {
         }
 
         return frequencies;
-
-    }
-
-    /**
-     * Constructs a Huffman tree from the given frequency list.
-     *
-     * @param   frequencies The frequency of each character in the original file.
-     *
-     * @return              The newly constructed huffman tree.
-     */
-    private static Element huffman( int[] frequencies ) {
-
-        // 1.) Construct the priority queue.
-
-        PQHeap huffmanQueue = new PQHeap();
-
-        for ( int i = 0; i < frequencies.length; i++ )
-            huffmanQueue.insert( new Element( frequencies[i], i ) );
-
-        // 2.) Construct the huffman nodes from the priority queue and build the tree.
-
-        while ( huffmanQueue.size() > 1 ) {
-
-            Element leftElem = huffmanQueue.extractMin();
-            Element rightElem = huffmanQueue.extractMin();
-
-            int freq = leftElem.key() + rightElem.key();
-
-            Node node = new Node( leftElem, rightElem );
-
-            Element nodeElement = new Element( freq, node );
-
-            huffmanQueue.insert( nodeElement );
-
-        }
-
-        return huffmanQueue.extractMin();
 
     }
 

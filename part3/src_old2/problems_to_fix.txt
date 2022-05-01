@@ -1,0 +1,5 @@
+First and foremost, there is a problem with the Huffman tree generation:
+Some characters are encoded as a substrings of other character encodings.
+This is bad, since the longer encoded characters will then never be interpreted.
+
+Secondly, there may be a problem with the decoding algorithm, but this is hard to test without a working encoding algorithm. First things first.

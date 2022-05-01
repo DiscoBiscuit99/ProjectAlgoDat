@@ -59,8 +59,8 @@ public class PQHeap implements PQ {
     private void exchange( int i, int j ) {
 
         Element tmpE = queue.get( i );
-        queue.set( i, queue.get( parentIdx( i ) ) );
-        queue.set( parentIdx( i ), tmpE );
+        queue.set( i, queue.get( j ) );
+        queue.set( j, tmpE );
 
     }
 
@@ -92,22 +92,14 @@ public class PQHeap implements PQ {
         int smallest;
 
         if ( l < queue.size() 
-                && queue.get( l ).key() <= queue.get( i ).key() ) {
-
+                && queue.get( l ).key() <= queue.get( i ).key() )
             smallest = l;
-
-        } else {
-
+        else 
             smallest = i;
 
-        }
-
         if ( r < queue.size() 
-                && queue.get( r ).key() <= queue.get( smallest ).key() ) {
-
+                && queue.get( r ).key() <= queue.get( smallest ).key() )
             smallest = r;
-
-        }
 
         if ( smallest != i ) {
 
@@ -160,22 +152,38 @@ public class PQHeap implements PQ {
      * Returns the size of the queue.
      */
     public int size() {
-
         return queue.size();
-
     }
 
     /**
      * Returns a textual representation of the priority queue.
      */
     public String toString() {
+        return ( queue.size() > 0 ? subtreeString( 0, 0, false ) : "" );
+    }
 
-        String str = "";
+    /**
+     * Returns a textual representation of the subtree at the given index.
+     */
+    public String subtreeString( int index, int indent, boolean isLeftChild ) {
 
-        for ( Element e : queue ) 
-            str += "(" + e.key() + ", " + e.data().toString() + ")   ";
+        String leftOrRight = isLeftChild ? "l" : "r";
 
-        return str;
+        String indentation = "";
+        for ( int i = 0; i < indent; i++ )
+            indentation += "|   ";
+
+        Element e = queue.get( index );
+
+        String subtree = indentation + leftOrRight + ": ( key: " + e.key() + ", data: " + e.data() + " )\n";
+
+        if ( leftIdx( index ) < queue.size() )
+            subtree += subtreeString( leftIdx( index ), indent + 1, true );
+
+        if ( rightIdx( index ) < queue.size() )
+            subtree += subtreeString( rightIdx( index ), indent + 1, false );
+
+        return subtree;
 
     }
 
