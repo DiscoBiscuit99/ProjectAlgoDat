@@ -1,3 +1,11 @@
+/*
+ * Bastian Blohm (bablo21@student.sdu.dk)
+ * Ian Andersen (iaand21@student.sdu.dk)
+ * Valdemar Lorenzen (valor21@student.sdu.dk)
+ *
+ * Aflevering af delprojekt 3 - Algoritmer og Datastrukturer.
+ */
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,15 +25,18 @@ public class Decode {
         String filenameCompressed = args[ 0 ];
         String filenameDecompressed = args[ 1 ];
 
-        decode( filenameCompressed, filenameDecompressed );
+        decompress( filenameCompressed, filenameDecompressed );
 
     }
 
-    private static int[] decode( String filenameCompressed, String filenameDecompressed ) {
-
-        int[] frequencies = new int[ 256 ];
+    /**
+     * Decompresses the given (compressed) file.
+     */
+    private static void decompress( String filenameCompressed, String filenameDecompressed ) {
 
         try {
+
+            // Construct the relevant streams.
 
             File compressed = new File( filenameCompressed );
             File decompressed = new File( filenameDecompressed );
@@ -35,8 +46,48 @@ public class Decode {
 
             FileOutputStream foStream = new FileOutputStream( decompressed );
 
+            // Construct the frequency table from the start of the compressed file.
 
-            // 1. Construct the frequency table from the start of the compressed file.
+            int[] frequencies = constructFreqTable( biStream );
+            
+            // Construct the Huffman tree from the frequency table.
+
+            Huffman ht = new Huffman();
+            ht.constructTree( frequencies );
+
+            // Decode the file.
+
+            decode( ht.root(), biStream, foStream );
+
+            // Close the streams.
+
+            biStream.close();
+            foStream.close();
+
+        } catch ( IOException e ) {
+            
+            e.printStackTrace();
+
+        }
+
+    }
+
+    /**
+     * Takes a BitInputStream and copies the next 256 integers into a frequency list.
+     * 
+     * Post: close the stream.
+     *
+     * @return  An integer array of frequencies.
+     */
+    private static int[] constructFreqTable( BitInputStream biStream ) {
+
+        int[] frequencies = new int[ 256 ];
+
+        for ( int f : frequencies ) f = 0; // Make sure no noise exists in the array.
+
+        try {
+
+            // Copy the next 256 integers into frequencies.
 
             for ( int i = 0; i < frequencies.length; i++ ) {
 
@@ -44,15 +95,28 @@ public class Decode {
                 frequencies[ i ] = frequency;
 
             }
-            
-            // 2. Construct the Huffman tree from the frequency table.
 
-            Huffman ht = new Huffman();
-            ht.constructTree( frequencies );
+        } catch ( IOException e ) {
 
-            // 3. Decode the file by descending the tree with each bit in the compressed file.
+            e.printStackTrace();
 
-            Element currentNode = ht.root();
+        }
+
+        return frequencies;
+
+    }
+
+    /**
+     * Takes a node, a BitInputStream, and a FileOutputStream and decodes the file by 
+     * descending the tree with each bit in the compressed file.
+     *
+     * Post: close the streams.
+     */
+    private static void decode( Element root, BitInputStream biStream, FileOutputStream foStream ) {
+
+        try {
+
+            Element currentNode = root;
 
             int b = 0;
             while ( b != -1 ) {
@@ -64,14 +128,18 @@ public class Decode {
                     // A left node is found.
                     case 0:
 
+                        // 1. Descend to the left.
+
                         if ( currentNode.data() instanceof Node )
                             currentNode = (Element) ( (Node) currentNode.data() ).left();
+
+                        // 2. Check whether the child node is a leaf and act accordingly.
 
                         if ( currentNode.data() instanceof Character ) {
 
                             char c = (char) currentNode.data();
                             foStream.write( c );
-                            currentNode = ht.root();
+                            currentNode = root;
 
                         }
 
@@ -80,14 +148,18 @@ public class Decode {
                     // A right node is found.
                     case 1:
 
+                        // 1. Descend to the right.
+
                         if ( currentNode.data() instanceof Node )
                             currentNode = (Element) ( (Node) currentNode.data() ).right();
+
+                        // 2. Check whether the child node is a leaf and act accordingly.
 
                         if ( currentNode.data() instanceof Character ) {
 
                             char c = (char) currentNode.data();
                             foStream.write( c );
-                            currentNode = ht.root();
+                            currentNode = root;
 
                         }
 
@@ -97,16 +169,11 @@ public class Decode {
 
             }
 
-            biStream.close();
-            foStream.close();
-
         } catch ( IOException e ) {
-            
+
             e.printStackTrace();
 
         }
-
-        return frequencies;
 
     }
 

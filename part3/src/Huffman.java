@@ -1,3 +1,11 @@
+/*
+ * Bastian Blohm (bablo21@student.sdu.dk)
+ * Ian Andersen (iaand21@student.sdu.dk)
+ * Valdemar Lorenzen (valor21@student.sdu.dk)
+ *
+ * Aflevering af delprojekt 3 - Algoritmer og Datastrukturer.
+ */
+
 public class Huffman {
 
     private Element root;
@@ -6,21 +14,27 @@ public class Huffman {
      * Returns a new Huffman tree with the given node as the root.
      */
     public Huffman( Element root ) {
+
         this.root = root;
+
     }
 
     /**
      * Returns a new Huffman tree with no root (root = null).
      */
     public Huffman() {
+
         this.root = null;
+
     }
 
     /**
      * Returns the root node of this Huffman tree.
      */
     public Element root() {
+
         return root;
+
     }
 
     /**
@@ -66,7 +80,7 @@ public class Huffman {
     /**
      * Constructs the codewords from the Huffman tree.
      *
-     * Pre: root can't be null.
+     * Pre: root cannot be null.
      */
     public String[] constructCodes() {
 
@@ -117,7 +131,9 @@ public class Huffman {
      * Returns a textual representation of the tree.
      */
     public String toString() {
+        
         return subtreeString( root, 0, false );
+
     }
 
     /**
@@ -126,8 +142,12 @@ public class Huffman {
      */
     public String subtreeString( Element wrappedNode, int indent, boolean isLeftChild ) {
 
+        // Determine the prefix.
+
         int freq = wrappedNode.key();
         String leftOrRight = isLeftChild ? "l" : "r";
+
+        // Indent sufficiently.
 
         String indentation = "";
         for ( int i = 0; i < indent; i++ )
@@ -135,6 +155,7 @@ public class Huffman {
 
         String subtree = indentation + leftOrRight + ": ";
 
+        // If it's not a leaf node, add some relevant information to the string and recurse.
         if ( wrappedNode.data() instanceof Node ) {
 
             subtree += "( frequency: " + freq + " )\n";
@@ -145,6 +166,7 @@ public class Huffman {
             subtree += subtreeString( leftChild, indent + 1, true );
             subtree += subtreeString( rightChild, indent + 1, false );
 
+        // If it is a leaf node, add its data to the string.
         } else if ( wrappedNode.data() instanceof Character ) {
             
             char c = (char) wrappedNode.data();
